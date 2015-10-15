@@ -205,6 +205,12 @@ private slots:
 	void actionExportSVG();
 	void actionExportCSG();
 	void actionExportImage();
+#ifdef ENABLE_CARVING
+	void actionCarvingPath();
+    void actionCarvingResult();
+    void actionCarvingAssembly();
+	void actionExportNGC();
+#endif /* ENABLE_CARVING */
 	void actionCopyViewport();
 	void actionFlushCaches();
 
