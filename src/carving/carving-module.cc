@@ -432,6 +432,11 @@ AbstractNode *CarvingModule::instantiateDrillNode(const Context *ctx, const Modu
     return NULL;
   }
 
+  if (!isfinite(workpiece_thickness)) {
+    PRINTB("WARNING: Carving: %s() should be a child of carving_workpiece() module", inst->name());
+    return NULL;
+  }
+
   double x = 0;
   double y = 0;
   if (ctx_get_vect2d(c, inst->name(), "v", x, y, false) < 0) {
@@ -469,6 +474,11 @@ AbstractNode *CarvingModule::instantiatePath2dNode(const Context *ctx, const Mod
   shared_ptr<CarvingSettings> settings = Carving::instance()->getSettings();
   if (!settings->isTool(tool_name)) {
     PRINTB("WARNING: Carving: %s(), tool name '%s' must be registered with carving_tool() first", inst->name() % tool_name);
+    return NULL;
+  }
+
+  if (!isfinite(workpiece_thickness)) {
+    PRINTB("WARNING: Carving: %s() should be a child of carving_workpiece() module", inst->name());
     return NULL;
   }
 
