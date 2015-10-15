@@ -72,6 +72,10 @@
   #endif
 #endif
 
+#ifdef ENABLE_CARVING
+#include "carving/carving.h"
+#endif /* ENABLE_CARVING */
+
 #ifdef _MSC_VER
 #define snprintf _snprintf
 #endif
@@ -344,6 +348,9 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 	const char *ast_output_file = NULL;
 	const char *term_output_file = NULL;
 	const char *echo_output_file = NULL;
+#ifdef ENABLE_CARVING
+	const char *ngc_output_file = NULL;
+#endif
 
 	std::string suffix = boosty::extension_str( output_file );
 	boost::algorithm::to_lower( suffix );
@@ -358,6 +365,9 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 	else if (suffix == ".ast") ast_output_file = output_file;
 	else if (suffix == ".term") term_output_file = output_file;
 	else if (suffix == ".echo") echo_output_file = output_file;
+#ifdef ENABLE_CARVING
+	else if (suffix == ".ngc") ngc_output_file = output_file;
+#endif
 	else {
 		PRINTB("Unknown suffix for output file %s\n", output_file);
 		return 1;
@@ -411,6 +421,9 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 	if (!(root_node = find_root_tag(absolute_root_node)))
 		root_node = absolute_root_node;
 
+#ifdef ENABLE_CARVING
+		Carving::instance()->updateCarvingContext(root_node);
+#endif
 	tree.setRoot(root_node);
 
 	if (csg_output_file) {
@@ -540,6 +553,15 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 				fstream.close();
 			}
 		}
+
+#ifdef ENABLE_CARVING
+		if (ngc_output_file) {
+			if (!Carving::instance()->exportAsNGC(root_node, ngc_output_file)) {
+				return 1;
+			}
+		}
+#endif
+
 #else
 		PRINT("OpenSCAD has been compiled without CGAL support!\n");
 		return 1;
@@ -777,6 +799,9 @@ int main(int argc, char **argv)
 	CGAL::set_error_behaviour(CGAL::ABORT);
 #endif
 	Builtins::instance()->initialize();
+#ifdef ENABLE_CARVING
+	Carving::instance()->initialize();
+#endif /* ENABLE_CARVING */
 
 	fs::path original_path = fs::current_path();
 

@@ -500,6 +500,33 @@ SOURCES += src/cgalutils.cc \
            src/Polygon2d-CGAL.cc
 }
 
+carving {
+  HEADERS += src/carving/carving.h \
+             src/carving/carving-update-visitor.h \
+             src/carving/carving-geometry.h \
+             src/carving/carving-module.h \
+             src/carving/carving-node.h \
+             src/carving/carving-operation.h \
+             src/carving/carving-prune-visitor.h \
+             src/carving/carving-settings.h \
+             src/carving/gcode.h \
+             src/carving/gcode-export.h
+
+  SOURCES += src/carving/carving.cc \
+             src/carving/carving-update-visitor.cc \
+             src/carving/carving-geometry.cc \
+             src/carving/carving-module.cc \
+             src/carving/carving-node.cc  \
+             src/carving/carving-operation.cc \
+             src/carving/carving-prune-visitor.cc \
+             src/carving/carving-settings.cc \
+             src/carving/gcode.cc \
+             src/carving/gcode-export.cc
+
+  DEFINES += ENABLE_CARVING
+  DEFINES += ENABLE_CARVING_UNSTABLE
+}
+
 macx {
   HEADERS += src/AppleEvents.h \
              src/EventFilter.h \

@@ -94,5 +94,7 @@
     <file>images/STL-white.png</file>
     <file>images/SVG.png</file>
     <file>images/SVG-white.png</file>
+    <file>images/NGC.png</file>
+    <file>images/NGC-white.png</file>
   </qresource>
 </RCC>

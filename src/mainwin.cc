@@ -125,6 +125,10 @@
 #include "boosty.h"
 #include "FontCache.h"
 
+#ifdef ENABLE_CARVING
+#include "carving/carving.h"
+#endif /* ENABLE_CARVING */
+
 // Keeps track of open window
 QSet<MainWindow*> *MainWindow::windows = NULL;
 
@@ -378,6 +382,18 @@ MainWindow::MainWindow(const QString &filename)
 	connect(this->fileActionExportCSG, SIGNAL(triggered()), this, SLOT(actionExportCSG()));
 	connect(this->fileActionExportImage, SIGNAL(triggered()), this, SLOT(actionExportImage()));
 	connect(this->designActionFlushCaches, SIGNAL(triggered()), this, SLOT(actionFlushCaches()));
+#ifdef ENABLE_CARVING
+    this->menu_View->addSeparator();
+    this->menu_View->addMenu(this->menuCarving);
+    this->carvingActionPath->setChecked(Carving::instance()->isRenderingModePath());
+    this->carvingActionResult->setChecked(Carving::instance()->isRenderingModeResult());
+    this->carvingActionAssembly->setChecked(Carving::instance()->isRenderingModeAssembly());
+    connect(this->carvingActionPath, SIGNAL(triggered()), this, SLOT(actionCarvingPath()));
+    connect(this->carvingActionResult, SIGNAL(triggered()), this, SLOT(actionCarvingResult()));
+    connect(this->carvingActionAssembly, SIGNAL(triggered()), this, SLOT(actionCarvingAssembly()));
+    this->fileActionExportNGC->setVisible(true);
+	connect(this->fileActionExportNGC, SIGNAL(triggered()), this, SLOT(actionExportNGC()));
+#endif /* ENABLE_CARVING */
 
 	// View menu
 #ifndef ENABLE_OPENCSG
@@ -520,6 +536,9 @@ MainWindow::MainWindow(const QString &filename)
 	initActionIcon(fileActionExportDXF, ":/images/DXF.png", ":/images/DXF-white.png");
 	initActionIcon(fileActionExportSVG, ":/images/SVG.png", ":/images/SVG-white.png");
 	initActionIcon(fileActionExportCSG, ":/images/CSG.png", ":/images/CSG-white.png");
+#ifdef ENABLE_CARVING
+	initActionIcon(fileActionExportNGC, ":/images/NGC.png", ":/images/CSG-white.png");
+#endif
 	initActionIcon(fileActionExportImage, ":/images/PNG.png", ":/images/PNG-white.png");
 	initActionIcon(viewActionViewAll, ":/images/zoom-all.png", ":/images/zoom-all-white.png");
 	initActionIcon(editActionUndo, ":/images/Command-Undo-32.png", ":/images/Command-Undo-32-white.png");
@@ -1121,6 +1140,9 @@ void MainWindow::instantiateRoot()
 				this->root_node = this->absolute_root_node;
 			}
 			// FIXME: Consider giving away ownership of root_node to the Tree, or use reference counted pointers
+#ifdef ENABLE_CARVING
+		Carving::instance()->updateCarvingContext(this->root_node);
+#endif
 			this->tree.setRoot(this->root_node);
 			// Dump the tree (to initialize caches).
 			// FIXME: We shouldn't really need to do this explicitly..
@@ -2251,6 +2273,53 @@ void MainWindow::actionExportCSG()
 
 	clearCurrentOutput();
 }
+
+#ifdef ENABLE_CARVING
+
+void MainWindow::actionCarvingPath()
+{
+  PRINTD("DEBUG Carving: MainWindow::actionCarvingPath()");
+  if (carvingActionPath->isChecked()) {
+    Carving::instance()->setRenderingModePath();
+  }
+}
+
+void MainWindow::actionCarvingResult()
+{
+  PRINTD("DEBUG Carving: MainWindow::actionCarvingResult()");
+  if (carvingActionResult->isChecked()) {
+    Carving::instance()->setRenderingModeResult();
+  }
+}
+
+void MainWindow::actionCarvingAssembly()
+{
+  PRINTD("DEBUG Carving: MainWindow::actionCarvingAssembly()");
+  if (carvingActionAssembly->isChecked()) {
+    Carving::instance()->setRenderingModeAssembly();
+  }
+}
+
+void MainWindow::actionExportNGC()
+{
+	PRINTD("DEBUG Carving: MainWindow::actionExportNGC()");
+	setCurrentOutput();
+
+	QString format = "G-Code";
+	QString extension = ".ngc";
+	QString caption = QString("Export %1 File").arg(format);
+    QString filter = QString("%1 files (*%2)").arg(format, extension);
+	QString suggestion;
+	if (!this->fileName.isEmpty()) {
+      suggestion = QFileInfo(this->fileName).baseName() + extension;
+	} else {
+      suggestion = QString("Untitled%1").arg(extension);
+	}
+	QString filename = QFileDialog::getSaveFileName(this, caption, suggestion, filter);
+	Carving::instance()->exportAsNGC(this->tree.root(), filename.toUtf8(), filename.toLocal8Bit().constData());
+	clearCurrentOutput();
+}
+#endif /* ENABLE_CARVING */
 
 void MainWindow::actionExportImage()
 {

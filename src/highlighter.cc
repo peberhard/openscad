@@ -159,6 +159,10 @@ void format_colors_for_light_background(QMap<QString,QTextCharFormat> &formats)
 	formats["curlies"].setForeground(QColor(32,32,20));
 	formats["bool"].setForeground(QColor("DarkRed"));
 
+#ifdef ENABLE_CARVING
+	formats["carving"].setForeground(QColor("DarkGreen"));
+#endif
+
 	formats["_$quote"].setForeground(Qt::darkMagenta);
 	formats["_$comment"].setForeground(Qt::darkCyan);
 	formats["_$number"].setForeground(QColor("DarkRed"));
@@ -181,6 +185,10 @@ void format_colors_for_dark_background(QMap<QString,QTextCharFormat> &formats)
 	formats["bracket"].setForeground(QColor("LimeGreen"));
 	formats["curlies"].setForeground(QColor("Lavender"));
 	formats["bool"].setForeground(QColor("Red"));
+
+#ifdef ENABLE_CARVING
+	formats["carving"].setForeground(QColor("LightBlue"));
+#endif
 
 	formats["_$quote"].setForeground(Qt::magenta);
 	formats["_$comment"].setForeground(Qt::cyan);
@@ -230,6 +238,10 @@ Highlighter::Highlighter(QTextDocument *parent)
 	tokentypes["bracket"] << "[" << "]" << "(" << ")";
 	tokentypes["curlies"] << "{" << "}";
 	tokentypes["bool"] << "true" << "false";
+
+#ifdef ENABLE_CARVING
+	tokentypes["carving"] << "carving_settings" << "carving_tool" << "carving_tool_speed" << "carving_workpiece" << "carving_drill" << "carving_path2d" << "carving_line" << "carving_arc";
+#endif
 
 	tokentypes["_$comment"] << "_$comment"; // bit of a kludge here
 	tokentypes["_$quote"] << "_$quote";
