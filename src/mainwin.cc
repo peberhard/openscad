@@ -1890,6 +1890,11 @@ void MainWindow::csgRender()
 
 void MainWindow::actionRender()
 {
+#ifdef ENABLE_CARVING
+  carvingActionAssembly->setChecked(true);
+  Carving::instance()->setRenderingModeAssembly();
+#endif
+
 	if (GuiLocker::isLocked()) return;
 	GuiLocker::lock();
 	autoReloadTimer->stop();
