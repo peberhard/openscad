@@ -473,6 +473,11 @@ int cmdline(const char *deps_output_file, const std::string &filename, Camera &c
 	}
 	else {
 #ifdef ENABLE_CGAL
+
+#ifdef ENABLE_CARVING
+  Carving::instance()->setRenderingModeAssembly();
+#endif /* ENABLE_CARVING */
+
 		if ((echo_output_file || png_output_file) &&
 				(renderer==Render::OPENCSG || renderer==Render::THROWNTOGETHER)) {
 			// echo or OpenCSG png -> don't necessarily need geometry evaluation
