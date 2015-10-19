@@ -597,11 +597,13 @@ int extract_volume_from_net_polyhedron(const CGAL_Nef_polyhedron &nef, double x,
 {
   CGAL_Polyhedron ph;
   bool err = nefworkaround::convert_to_Polyhedron<CGAL_Kernel3>(*(nef.p3), ph);
-  PRINTB("ERROR: extract_volume_from_polyhedron err %d", err);
+  if (err) {
+    PRINTB("ERROR: extract_volume_from_polyhedron err %d", err);
+  }
   std::set<std::string> already_saw;
   std::list<Halfedge_iterator> queue;
   Halfedge_iterator he_iter = nef_polyhedron_get_closest_point(ph, x, y, z);
-  PRINTB("ERROR: extract_volume_from_net_polyhedron [%g, %g, %g] closest is [%g, %g, %g]",
+  PRINTDB("extract_volume_from_net_polyhedron [%g, %g, %g] closest is [%g, %g, %g]",
       x % y % z % he_iter->vertex()->point().x().to_double() % he_iter->vertex()->point().y().to_double() %
       he_iter->vertex()->point().z().to_double());
   assert(he_iter != ph.halfedges_end());
@@ -627,7 +629,7 @@ int extract_volume_from_net_polyhedron(const CGAL_Nef_polyhedron &nef, double x,
       }
       CGAL_Point_3 pt = it->vertex()->point();
       nef_polyhedron_bottom_left(pt, d0x, d0y, d0z);
-      std::cout << "[" << pt.x().to_double() << ", " << pt.y().to_double() << ", " << pt.z().to_double() << "] ";
+      PRINTDB("pt [%g, %g, %g]", pt.x().to_double() % pt.y().to_double() % pt.z().to_double());
       ps->insert_vertex(pt.x().to_double(), pt.y().to_double(), pt.z().to_double());
 
       it = it->prev();

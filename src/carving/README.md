@@ -1,5 +1,5 @@
 
-# OpenSCAD carving plugin
+# OpenSCAD carving feature for CNC Milling Machine
 
 See https://github.com/peberhard/openscad-carving-plugin-doc-examples for documentation and examples.
 
@@ -11,7 +11,7 @@ Follow [OpenSCAD build instructions](https://en.wikibooks.org/wiki/OpenSCAD_User
     $ make
 
 
-## carving plugin overview
+## Carving overview
 
 - new keywords in language are prefixed by "carving_".
 - carving_modules handles the instantiation of new nodes related to the keywords.
@@ -27,7 +27,7 @@ Follow [OpenSCAD build instructions](https://en.wikibooks.org/wiki/OpenSCAD_User
 
 ## Backlog
 
-* Make carving 'plugin' activable using features?
+* Make carving feature enabled in settings (feature tab?)
 * Render accurately drill bit with front angle http://wiki.linuxcnc.org/cgi-bin/wiki.pl?ToolTable
 * Fold parts. Usage: Make a thin line cut in aluminum part to help folding with a drill bit of 45° front angle. Take into account bend deduction.
   https://en.wikipedia.org/wiki/Bending_%28metalworking%29#Bend_deduction
