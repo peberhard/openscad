@@ -619,7 +619,6 @@ int extract_volume_from_net_polyhedron(const CGAL_Nef_polyhedron &nef, double x,
     Halfedge_iterator it = begin;
     queue.pop_front();
     ps->append_poly();
-    std::cout << "halfedge face ";
     do {
       std::string k = halfedge_key(it);
       if (already_saw.count(k) == 0) {
@@ -629,13 +628,11 @@ int extract_volume_from_net_polyhedron(const CGAL_Nef_polyhedron &nef, double x,
       }
       CGAL_Point_3 pt = it->vertex()->point();
       nef_polyhedron_bottom_left(pt, d0x, d0y, d0z);
-      PRINTDB("pt [%g, %g, %g]", pt.x().to_double() % pt.y().to_double() % pt.z().to_double());
+      PRINTDB("halfedge face pt [%g, %g, %g]", pt.x().to_double() % pt.y().to_double() % pt.z().to_double());
       ps->insert_vertex(pt.x().to_double(), pt.y().to_double(), pt.z().to_double());
 
       it = it->prev();
     } while (it->vertex()->point() != begin->vertex()->point());
-
-    std::cout << std::endl;
 
   }
   // Translate object to [0, 0 ,0]
