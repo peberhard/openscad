@@ -99,6 +99,7 @@ public:
   const std::map<std::string, shared_ptr<const CarvingTool> > getTools() const;
   void setTool(shared_ptr<const CarvingTool> tool);
   bool isTool(const std::string &tool_name) const;
+  int getToolCount() const;
   shared_ptr<const CarvingTool> getTool(const std::string &tool_name) const;
   bool isMaterial(const std::string &material_name) const;
   void setToolSpeed(const shared_ptr<const CarvingToolSpeed> ts);
