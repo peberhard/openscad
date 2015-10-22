@@ -115,8 +115,13 @@ Response GCodeExportVisitor::visit(class State &state, const class AbstractNode 
   mergeGCodeChildren(node, gc);
 
   if (state.parent() == NULL) {	// root node end program
+    shared_ptr<CarvingSettings> s = Carving::instance()->getSettings();
     gc->children.push_back(make_shared<G49>());
-    gc->children.push_back(make_shared<G0>(Carving::instance()->getSettings()->getToolChangeHeight()));
+    if (s->getToolCount() < 1) {
+      gc->children.push_back(make_shared<G0>(s->getToolChangeHeight()));
+    } else { // tool change
+      gc->children.push_back(make_shared<G0>(s->getClearanceHeight()));
+    }
     gc->children.push_back(make_shared<M2>());
   }
 
@@ -197,29 +202,33 @@ void GCodeExportVisitor::fastPositioning(const class AbstractNode &node, double 
     PRINTDB("visit CarvingDrillNode changeTool previous_tool %p != current_tool %p",
         this->previous_tool % this->current_tool);
     this->previous_tool = this->current_tool;
-    // Tool change
-    // http://linuxcnc.org/docs/html/gcode/other-code.html#sec:T-Select-Tool
-    // http://linuxcnc.org/docs/html/gcode/m-code.html#sec:M6-Tool-Change
-    // http://linuxcnc.org/docs/html/gui/axis.html#sec:Manual-Tool-Change
-    // turn tool length compensation off
-    gc->children.push_back(make_shared<G49>());
-    gc->children.push_back(make_shared<G0>(Carving::instance()->getSettings()->getToolChangeHeight()));
-    gc->children.push_back(make_shared<TM6>(this->current_tool));
-    gc->children.push_back(make_shared<G43>());               // Z offset relative to new tool
+    if (s->getToolCount() > 1) {
+      // Tool change
+      // http://linuxcnc.org/docs/html/gcode/other-code.html#sec:T-Select-Tool
+      // http://linuxcnc.org/docs/html/gcode/m-code.html#sec:M6-Tool-Change
+      // http://linuxcnc.org/docs/html/gui/axis.html#sec:Manual-Tool-Change
+      // turn tool length compensation off
+      gc->children.push_back(make_shared<G49>());
+      gc->children.push_back(make_shared<G0>(Carving::instance()->getSettings()->getToolChangeHeight()));
+      gc->children.push_back(make_shared<TM6>(this->current_tool));
+      gc->children.push_back(make_shared<G43>());               // Z offset relative to new tool
 
-    gc->children.push_back(make_shared<M3>(this->current_tool_speed->getSpindleSpeed()));
+      gc->children.push_back(make_shared<M3>(this->current_tool_speed->getSpindleSpeed()));
 
-    // Issue: Visual representation of first G0 move in LinuxCNC is not visible.
-    // Workaround: Add a G1 on current position as explained in LinuxCNC documentation:
-    // http://linuxcnc.org/docs/html/gui/axis.html#sec:Manual-Tool-Change
-    // fix to show G0 rapid move in linuxCNC after tool change (note: empty cctx)
-    gc->children.push_back(make_shared<G0>(s->getClearanceHeight()));
-    // set required feedrate for G1 (even if no move)
-    if (this->current_feed_rate != this->current_tool_speed->getVerticalFeedrate()) {
-      this->current_feed_rate = this->current_tool_speed->getVerticalFeedrate();
-      gc->children.push_back(make_shared<F>(this->current_feed_rate));
+      // Issue: Visual representation of first G0 move in LinuxCNC is not visible.
+      // Workaround: Add a G1 on current position as explained in LinuxCNC documentation:
+      // http://linuxcnc.org/docs/html/gui/axis.html#sec:Manual-Tool-Change
+      // fix to show G0 rapid move in linuxCNC after tool change (note: empty cctx)
+      gc->children.push_back(make_shared<G0>(s->getClearanceHeight()));
+      // set required feedrate for G1 (even if no move)
+      if (this->current_feed_rate != this->current_tool_speed->getVerticalFeedrate()) {
+        this->current_feed_rate = this->current_tool_speed->getVerticalFeedrate();
+        gc->children.push_back(make_shared<F>(this->current_feed_rate));
+      }
+      gc->children.push_back(make_shared<G1>(s->getClearanceHeight()));
+    } else {
+      gc->children.push_back(make_shared<M3>(this->current_tool_speed->getSpindleSpeed()));
     }
-    gc->children.push_back(make_shared<G1>(s->getClearanceHeight()));
   }
   gc->children.push_back(make_shared<G0>(Carving::instance()->getSettings()->getClearanceHeight()));
   gc->children.push_back(make_shared<G0>(x, y));

@@ -233,6 +233,11 @@ bool CarvingSettings::isTool(const std::string &tool_name) const
   return this->tools.count(tool_name) == 1;
 }
 
+int CarvingSettings::getToolCount() const
+{
+  return this->tools.size();
+}
+
 shared_ptr<const CarvingTool> CarvingSettings::getTool(const std::string &tool_name) const
 {
   std::map<std::string, shared_ptr<const CarvingTool> >::const_iterator iter;
