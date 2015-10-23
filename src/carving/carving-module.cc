@@ -177,11 +177,8 @@ AbstractNode *CarvingModule::instantiate(const Context *ctx, const ModuleInstant
   case CARVING_PATH2D:
     node = instantiatePath2dNode(ctx, inst, evalctx);
     break;
-  case CARVING_RAPID_MOVE:
-    node = instantiateMoveNode(ctx, inst, evalctx);
-    break;
   case CARVING_LINEAR_MOVE:
-    node = instantiateMoveNode(ctx, inst, evalctx);
+    node = instantiateLinearMoveNode(ctx, inst, evalctx);
     break;
   case CARVING_ARC_MOVE:
     node = instantiateArcMoveNode(ctx, inst, evalctx);
@@ -533,10 +530,12 @@ AbstractNode *CarvingModule::instantiatePath2dNode(const Context *ctx, const Mod
   }
   PRINTDB("Carving: %s() end", inst->name());
 
+  CarvingModule::current_z = nan("");    // not in path2d anymore
+
   return node;
 }
 
-AbstractNode *CarvingModule::instantiateMoveNode(const Context *ctx, const ModuleInstantiation *inst,
+AbstractNode *CarvingModule::instantiateLinearMoveNode(const Context *ctx, const ModuleInstantiation *inst,
     EvalContext *evalctx) const
 {
   CarvingOperation *op = NULL;
@@ -545,6 +544,11 @@ AbstractNode *CarvingModule::instantiateMoveNode(const Context *ctx, const Modul
   args += Assignment("v");
   c.setVariables(args, evalctx);
 
+  if(!isfinite(CarvingModule::current_z)) {
+    PRINTB("WARNING: Carving: %s() should be a child of carving_path2d() module", inst->name());
+    return NULL;
+  }
+
   double x = nan("");
   double y = nan("");
   if (ctx_get_vect2d(c, inst->name(), "v", x, y, true) < 0) {
@@ -552,7 +556,6 @@ AbstractNode *CarvingModule::instantiateMoveNode(const Context *ctx, const Modul
   }
   op = CarvingOperation::newGCodeOpLinearMoveXY(x, y);
   assert(op);
-  assert(CarvingModule::current_z);
   PRINTDB("Carving: %s() instantiated %s, z %g", inst->name() % op->toString() % CarvingModule::current_z);
   return new CarvingOperationNode(inst, op, CarvingModule::current_z);
 }
@@ -565,6 +568,11 @@ AbstractNode *CarvingModule::instantiateArcMoveNode(const Context *ctx, const Mo
   Context c(ctx);
   args += Assignment("v"), Assignment("center"), Assignment("ccw"), Assignment("p");
   c.setVariables(args, evalctx);
+
+  if(!isfinite(CarvingModule::current_z)) {
+    PRINTB("WARNING: Carving: %s() should be a child of carving_path2d() module", inst->name());
+    return NULL;
+  }
 
   double x = nan("");
   double y = nan("");

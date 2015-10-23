@@ -620,6 +620,8 @@ std::string CarvingOperationNode::name() const
 void CarvingOperationNode::setOperationContext(shared_ptr<const CarvingTool> tool,
     shared_ptr<const CarvingToolSpeed> tool_speed, double thickness, const CarvingOperationNode *previous_op_node) const
 {
+  assert(tool);
+  assert(tool_speed);
   this->tool = tool;
   this->tool_speed = tool_speed;
   this->thickness = thickness;
