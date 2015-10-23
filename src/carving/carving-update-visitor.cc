@@ -72,7 +72,7 @@ void CarvingUpdateVisitor::execute()
 
 Response CarvingUpdateVisitor::visit(class State &state, const class AbstractNode &node)
 {
-  //  PRINTDB("visit class %s prefix %d", typeid(node).name() % state.isPrefix());
+//  PRINTDB("visit class %s prefix %d, current_tool %p", typeid(node).name() % state.isPrefix() % current_tool.get());
   if (state.isPrefix()) {
     if (in_reverse_node) {
       reverse_children(&node);
@@ -85,7 +85,7 @@ Response CarvingUpdateVisitor::visit(class State &state, const class AbstractNod
 
 Response CarvingUpdateVisitor::visit(class State &state, const class CsgNode &node)
 {
-  //  PRINTDB("visit class %s prefix %d", typeid(node).name() % state.isPrefix());
+//  PRINTDB("visit class %s prefix %d, current_tool %p", typeid(node).name() % state.isPrefix() % current_tool.get());
   if (const CarvingWorkpieceNode* workpiece_node = dynamic_cast<const CarvingWorkpieceNode*>(&node)) {
     return visit(state, *workpiece_node);
   }
@@ -114,8 +114,7 @@ Response CarvingUpdateVisitor::visit(class State &state, const class CsgNode &no
 
 Response CarvingUpdateVisitor::visit(class State &state, const TransformNode &node)
 {
-  //PRINTDB("visit class %s prefix %d, in_path2d %d", typeid(node).name() % state.isPrefix() % in_path2d);
-
+//  PRINTDB("visit class %s prefix %d, current_tool %p", typeid(node).name() % state.isPrefix() % current_tool.get());
   // if not inside workpiece
   if (this->material_name.empty()) {
     return ContinueTraversal;
@@ -136,7 +135,7 @@ Response CarvingUpdateVisitor::visit(class State &state, const TransformNode &no
 
 Response CarvingUpdateVisitor::visit(class State &state, const class LeafNode &node)
 {
-//	PRINTDB("visit class %s prefix %d", typeid(node).name() % state.isPrefix());
+//  PRINTDB("visit class %s prefix %d, current_tool %p", typeid(node).name() % state.isPrefix() % current_tool.get());
   const CarvingOperationNode* op_node = dynamic_cast<const CarvingOperationNode*>(&node);
   if (op_node) {
     return visit(state, *op_node);
@@ -152,7 +151,7 @@ Response CarvingUpdateVisitor::visit(class State &state, const class LeafNode &n
 
 Response CarvingUpdateVisitor::visit(class State &state, const class CarvingWorkpieceNode &node)
 {
-  //PRINTDB("visit %s %s", node.name() % (state.isPrefix() ? "prefix" : "    postfix"));
+//  PRINTDB("visit class %s prefix %d, current_tool %p", typeid(node).name() % state.isPrefix() % current_tool.get());
   if (state.isPrefix()) {
     this->material_name = node.getMaterialName();
     state.setMatrix(Transform3d::Identity());
@@ -164,6 +163,7 @@ Response CarvingUpdateVisitor::visit(class State &state, const class CarvingWork
 
 Response CarvingUpdateVisitor::visit(class State &state, const class CarvingDrillNode &node)
 {
+//  PRINTDB("visit class %s prefix %d, current_tool %p", typeid(node).name() % state.isPrefix() % current_tool.get());
   assert(!in_reverse_node);
   if (state.isPrefix()) {
     assert(isfinite(node.getX()) && isfinite(node.getY()));
@@ -180,7 +180,7 @@ Response CarvingUpdateVisitor::visit(class State &state, const class CarvingDril
 
 Response CarvingUpdateVisitor::visit(class State &state, const CarvingPath2dNode &node)
 {
-  PRINTDB("visit %s %s", node.name() % (state.isPrefix() ? "prefix" : "    postfix"));
+//  PRINTDB("visit class %s prefix %d, current_tool %p", typeid(node).name() % state.isPrefix() % current_tool.get());
   assert(!in_reverse_node);
   if (state.isPrefix()) {
     // reset transform matrix to get vectors relative to make children local coordinates relative to path2d.
@@ -214,6 +214,7 @@ Response CarvingUpdateVisitor::visit(class State &state, const CarvingPath2dNode
 
 Response CarvingUpdateVisitor::visit(class State &state, const class CarvingSliceNode &node)
 {
+//  PRINTDB("visit class %s prefix %d, current_tool %p", typeid(node).name() % state.isPrefix() % current_tool.get());
   if (state.isPrefix()) {
     assert(!this->in_reverse_node);
     shared_ptr<CarvingSettings> s = Carving::instance()->getSettings();
@@ -242,7 +243,7 @@ Response CarvingUpdateVisitor::visit(class State &state, const class CarvingSlic
 
 Response CarvingUpdateVisitor::visit(class State &state, const class CarvingReverseNode &node)
 {
-  // PRINTDB("visit class %s prefix %d", typeid(node).name() % state.isPrefix());
+//  PRINTDB("visit class %s prefix %d, current_tool %p", typeid(node).name() % state.isPrefix() % current_tool.get());
   if (state.isPrefix()) {
     in_reverse_node = !in_reverse_node;
     if (in_reverse_node) {
@@ -256,7 +257,7 @@ Response CarvingUpdateVisitor::visit(class State &state, const class CarvingReve
 
 Response CarvingUpdateVisitor::visit(class State &state, const CarvingOperationNode &node)
 {
-  // PRINTDB("visit class %s prefix %d", typeid(node).name() % state.isPrefix());
+//  PRINTDB("visit class %s prefix %d, current_tool %p", typeid(node).name() % state.isPrefix() % current_tool.get());
   if (state.isPrefix()) {
     if (in_reverse_node) {
       CarvingOperation *next_previous_op_node_rev = node.getOp();

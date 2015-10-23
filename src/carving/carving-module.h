@@ -50,7 +50,7 @@ private:
   AbstractNode *instantiatePartNode(const Context *ctx, const ModuleInstantiation *inst, EvalContext *evalctx) const;
   AbstractNode *instantiateDrillNode(const Context *ctx, const ModuleInstantiation *inst, EvalContext *evalctx) const;
   AbstractNode *instantiatePath2dNode(const Context *ctx, const ModuleInstantiation *inst, EvalContext *evalctx) const;
-  AbstractNode *instantiateMoveNode(const Context *ctx, const ModuleInstantiation *inst, EvalContext *evalctx) const;
+  AbstractNode *instantiateLinearMoveNode(const Context *ctx, const ModuleInstantiation *inst, EvalContext *evalctx) const;
   AbstractNode *instantiateArcMoveNode(const Context *ctx, const ModuleInstantiation *inst, EvalContext *evalctx) const;
   AbstractNode *instantiateReverseNode(const Context *ctx, const ModuleInstantiation *inst, EvalContext *evalctx) const;
   AbstractNode *instantiateAssemblyNode(const Context *ctx, const ModuleInstantiation *inst, EvalContext *evalctx) const;
